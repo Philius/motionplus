@@ -573,6 +573,10 @@ static void snd_pulse_init(ctx_dev *snd)
         };
         int errcd;
 
+        MOTPLS_LOG(INF, TYPE_STREAM, NO_ERRNO
+            ,_("PulseAudio device : %s")
+            , (snd->conf->snd_device=="" ? "<empty>" : snd->conf->snd_device.c_str()));
+
         snd->snd_pulse->dev = NULL;
         snd->snd_pulse->dev = pa_simple_new(
             (info->pulse_server=="" ? NULL : info->pulse_server.c_str())

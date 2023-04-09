@@ -20,6 +20,8 @@
 #ifndef _INCLUDE_VIDEO_V4L2_HPP_
 #define _INCLUDE_VIDEO_V4L2_HPP_
 
+#include "src/motionplus.hpp"
+#include <linux/videodev2.h>
 typedef struct video_image_buff {
     unsigned char   *ptr;
     int             content_length;

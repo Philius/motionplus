@@ -22,6 +22,10 @@
 #ifndef _INCLUDE_MOVIE_HPP_
 #define _INCLUDE_MOVIE_HPP_
 
+#include "netcam.hpp"
+#include "util.hpp"
+#include <libavcodec/avcodec.h>
+#include <libavformat/avformat.h>
 #include <stdio.h>
 #include <stdarg.h>
 #include <sys/time.h>

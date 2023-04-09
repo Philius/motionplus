@@ -151,10 +151,10 @@ void *myrealloc(void *ptr, size_t size, const char *desc)
     void *dummy = NULL;
 
     if (size == 0) {
-        free(ptr);
         MOTPLS_LOG(WRN, TYPE_ALL, NO_ERRNO
             ,_("Warning! Function %s tries to resize memoryblock at %p to 0 bytes!")
             ,desc, ptr);
+        free(ptr);
     } else {
         dummy = realloc(ptr, size);
         if (!dummy) {

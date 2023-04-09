@@ -738,6 +738,9 @@ static void motpls_cam_delete(ctx_motapp *motapp)
 /** Main entry point of MotionPlus. */
 int main (int argc, char **argv)
 {
+    system("truncate -s 0 motionplus.log");
+    system("rm CAM01*.mkv");
+
     int indx;
     ctx_motapp *motapp;
 
@@ -750,7 +753,6 @@ int main (int argc, char **argv)
     motpls_startup(motapp, true);
 
     movie_global_init();
-
     while (true) {
 
         if (motapp->restart_all) {

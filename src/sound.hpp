@@ -20,7 +20,8 @@
 #ifndef _INCLUDE_SOUND_HPP_
 #define _INCLUDE_SOUND_HPP_
 
-    void *snd_loop(void *arg);
+#include "src/motionplus.hpp"
+void *snd_loop(void *arg);
     void snd_cleanup(ctx_dev *snd);
 
 #endif /* _INCLUDE_SOUND_HPP_ */

@@ -21,6 +21,8 @@
 #ifndef _INCLUDE_UTIL_HPP_
 #define _INCLUDE_UTIL_HPP_
 
+#include "motionplus.hpp"
+#include <libavcodec/codec.h>
 #if (MYFFVER >= 56000)
     #define MY_PIX_FMT_YUV420P   AV_PIX_FMT_YUV420P
     #define MY_PIX_FMT_YUVJ420P  AV_PIX_FMT_YUVJ420P

@@ -22,6 +22,9 @@
 #ifndef _INCLUDE_NETCAM_HPP_
 #define _INCLUDE_NETCAM_HPP_
 
+#include "util.hpp"
+#include <bits/types/struct_timespec.h>
+#include <cstddef>
 #define NETCAM_BUFFSIZE 4096
 
 enum NETCAM_STATUS {
