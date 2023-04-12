@@ -55,6 +55,14 @@ sleep 6
 if [ -z "$Qt" ]; then
   /v3c/RaspberryPi/MotionEye/build-motionplus-Desktop_Qt_6_4_1_GCC_64bit-Debug/motionplus -c $HERE/motionplus.cfg -l $HERE/motionplus.log -p $HERE/motionplus.pid
   motionplus_pid="$(cat motionplus.pid)"
+else
+	cat <<-"EOF"
+	You can now start a debug session for motionplus within Qt Creator.
+	You first need to set the following for the motionplus project:
+	Command line arguments: -c motionplus.conf -n # non-daemon mode
+	Working directory: /v3c/RaspberryPi/MotionEye/motionplus/testing/rtsp-simple-server
+	I have "Add build library search path to LD_LIBRARY_PATH" checked.
+EOF
 fi
 
 mpv rtsp://localhost:8554/stream
