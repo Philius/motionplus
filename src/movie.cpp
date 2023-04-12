@@ -1257,6 +1257,7 @@ static int movie_passthru_streams(ctx_movie *movie)
 
         pthread_mutex_lock(&movie->netcam_data->mutex_transfer);
             for (indx= 0; indx < (int)movie->netcam_data->transfer_format->nb_streams; indx++) {
+                retcd = 0; // In case it's neither audio nor video.
                 stream_in = movie->netcam_data->transfer_format->streams[indx];
                 if (stream_in->codecpar->codec_type == AVMEDIA_TYPE_VIDEO) {
                     retcd = movie_passthru_streams_video(movie, stream_in);

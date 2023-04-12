@@ -738,9 +738,6 @@ static void motpls_cam_delete(ctx_motapp *motapp)
 /** Main entry point of MotionPlus. */
 int main (int argc, char **argv)
 {
-    system("truncate -s 0 motionplus.log");
-    system("rm CAM01*.mkv");
-
     int indx;
     ctx_motapp *motapp;
 
@@ -774,9 +771,13 @@ int main (int argc, char **argv)
             SLEEP(1, 0);
 
             if (motpls_check_threadcount(motapp)) {
+                MOTPLS_LOG(NTC, TYPE_ALL, NO_ERRNO
+                           ,_("motpls_check_threadcount() returned 1."));
                 break;
             }
 
+            MOTPLS_LOG(NTC, TYPE_ALL, NO_ERRNO
+                       ,_("Starting %d cameras."), motapp->cam_cnt);
             for (indx=0; indx<motapp->cam_cnt; indx++) {
                 /* Check if threads wants to be restarted */
                 if ((motapp->cam_list[indx]->running_dev == false) &&
@@ -788,6 +789,8 @@ int main (int argc, char **argv)
                 }
                 motpls_watchdog(motapp, indx);
             }
+            MOTPLS_LOG(NTC, TYPE_ALL, NO_ERRNO
+                       ,_("Starting %d audio inputs."), motapp->snd_cnt);
             for (indx=0; indx<motapp->snd_cnt; indx++) {
                 if ((motapp->snd_list[indx]->running_dev == false) &&
                     (motapp->snd_list[indx]->restart_dev == true)) {

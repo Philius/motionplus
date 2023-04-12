@@ -1,0 +1,59 @@
+#!/bin/bash
+if [ "Qt" = "$1" ] ; then
+  Qt=1
+fi
+if [ -z "$Qt" ]; then
+  echo "Not Qt!"
+else
+  echo "Qt!"
+fi
+set -e
+
+HERE="$(dirname "$(readlink -f "$0")")"
+echo "Script directory: $HERE"
+cd $HERE
+
+trap0()
+{
+  if [ "" != "$ffmpeg_pids$mediamtx_pid$motionplus_pid" ] ; then
+    echo "rtsp-simple-server done: killing [$ffmpeg_pids $mediamtx_pid $motionplus_pid]"
+    kill $ffmpeg_pids $mediamtx_pid $motionplus_pid 2>/dev/null || true
+    sleep 2
+  fi
+  echo "rtsp-simple-server done."
+}
+trap trap0 0
+
+killall ffmpeg 2>/dev/null || true
+killall mediamtx 2>/dev/null || true
+
+if [ -z "$Qt" ]; then
+  killall motionplus 2>/dev/null || true
+  rm motionplus.log 2>/dev/null || true
+fi
+rm mediamtx.log 2>/dev/null || true
+rm *.mkv 2>/dev/null || true
+
+sed -e "s'@RUNDIR@'$HERE'" -e 's|@URL@|rtsp://localhost:8554/stream|' camera1.conf.in > camera1.conf
+
+# 1. mediamtx
+../rtsp-simple-server/binaries/mediamtx &
+mediamtx_pid="$(pidof mediamtx)"
+
+sleep 3
+
+# 2. Provide the stream
+#ffmpeg -thread_queue_size 1024 -probesize 10000000 -i /dev/video0 -f pulse -i alsa_input.usb-HD_WEB_CAMERA_HD_WEB_CAMERA_SN0001-02.mono-fallback -map_channel 1.0.0 -ac 1 -c:a mp3 -vcodec libx264 -preset ultrafast -tune zerolatency -r 30 -s hd1080 -g 30 -b:v 6M -f rtsp -rtsp_buffer_size 10000000 -rtsp_transport tcp rtsp://localhost:8554/stream &
+
+ffmpeg -thread_queue_size 1024 -probesize 10000000 -i /dev/video0 -f pulse -i alsa_input.usb-HD_WEB_CAMERA_HD_WEB_CAMERA_SN0001-02.mono-fallback -map_channel 1.0.0 -ac 1 -c:a mp3 -vcodec libx264 -preset ultrafast -tune zerolatency -r 30 -s 1920x1080 -g 30 -b:v 6M -f rtsp -buffer_size 10000000 -rtsp_transport tcp rtsp://localhost:8554/stream &
+
+ffmpeg_pids="$(pidof ffmpeg)"
+
+sleep 6
+
+if [ -z "$Qt" ]; then
+  /v3c/RaspberryPi/MotionEye/build-motionplus-Desktop_Qt_6_4_1_GCC_64bit-Debug/motionplus -c $HERE/motionplus.cfg -l $HERE/motionplus.log -p $HERE/motionplus.pid
+  motionplus_pid="$(cat motionplus.pid)"
+fi
+
+mpv rtsp://localhost:8554/stream

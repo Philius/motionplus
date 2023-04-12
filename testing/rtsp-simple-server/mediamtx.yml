@@ -1,0 +1,24 @@
+protocols: [tcp]
+# Sets the verbosity of the program; available values are "error", "warn", "info", "debug".
+logLevel: info
+# Destinations of log messages; available values are "stdout", "file" and "syslog".
+logDestinations: [file]
+# If "file" is in logDestinations, this is the file which will receive the logs.
+logFile: mediamtx.log
+# Number of read buffers.
+# A higher value allows a wider throughput, a lower value allows to save RAM.
+readBufferCount: 512
+###############################################
+# RTSP parameters
+
+# Disable support for the RTSP protocol.
+rtspDisable: no
+protocols: [udp, multicast, tcp]
+# Encrypt handshakes and TCP streams with TLS (RTSPS).
+# Available values are "no", "strict", "optional".
+encryption: "no"
+rtspAddress: :8554
+
+paths:
+  all:
+    source: publisher

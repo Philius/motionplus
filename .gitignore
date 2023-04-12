@@ -59,3 +59,4 @@ po/stamp-po
 
 .vscode/
 
+testing/rtsp-simple-server/camera1.conf

@@ -70,4 +70,10 @@ HEADERS += \
     config.hpp
 
 DISTFILES += \
-    .gdbinit
+    doc/motionplus.gif \
+    doc/motionplus_build.html \
+    doc/motionplus_config.html \
+    doc/motionplus_examples.html \
+    doc/motionplus_guide.html \
+    doc/motionplus_stylesheet.css \
+    doc/samplepage.html
