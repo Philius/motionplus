@@ -131,7 +131,7 @@ static void snd_load_alerts(ctx_dev *snd)
     ctx_params      *tmp_params;
     int     indx;
 
-    conf_edit_get(snd->conf, "snd_alerts", parm_val, PARM_CAT_18);
+    snd->conf->conf_edit_get("snd_alerts", parm_val, PARM_CAT_18);
 
     for (it_p=parm_val.begin(); it_p!=parm_val.end(); it_p++) {
         tmp_params = (ctx_params*)mymalloc(sizeof(ctx_params));

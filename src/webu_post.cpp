@@ -443,9 +443,7 @@ void webu_post_write_config(ctx_webui *webui)
             }
         }
     }
-
-    conf_parms_write(webui->motapp);
-
+    webui->motapp->conf_parms_write();
 }
 
 /* Process the configuration parameters */
@@ -497,12 +495,12 @@ static void webu_post_config(ctx_webui *webui)
 
             if (config_parms[indx2].parm_name != "") {
                 if (config_parms[indx2].parm_cat == PARM_CAT_00) {
-                    conf_edit_set(webui->motapp->conf
-                        , config_parms[indx2].parm_name
+                    webui->motapp->conf->conf_edit_set(
+                        config_parms[indx2].parm_name
                         , webui->post_info[indx].key_val);
                 } else {
-                    conf_edit_set(webui->motapp->cam_list[webui->threadnbr]->conf
-                        , config_parms[indx2].parm_name
+                    webui->motapp->cam_list[webui->threadnbr]->conf
+                        ->conf_edit_set(config_parms[indx2].parm_name
                         , webui->post_info[indx].key_val);
                 }
             }

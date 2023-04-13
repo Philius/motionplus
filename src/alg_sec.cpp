@@ -36,6 +36,8 @@
     #include <opencv2/video.hpp>
 #pragma GCC diagnostic pop
 
+namespace {
+
 using namespace cv;
 using namespace dnn;
 
@@ -771,4 +773,19 @@ void algsec_detect(ctx_dev *cam)
     #else
         (void)cam;
     #endif
+}
+
+} // namespace
+
+void ctx_dev::algsec_detect()
+{
+    ::algsec_detect(this);
+}
+void ctx_dev::algsec_init()
+{
+    ::algsec_init(this);
+}
+void ctx_dev::algsec_deinit()
+{
+    ::algsec_deinit(this);
 }

@@ -59,7 +59,7 @@ mhdrslt webu_file_main(ctx_webui *webui)
     }
 
     if (webui->cam->motapp->dbse->movie_cnt == 0) {
-        dbse_movies_getlist(webui->cam->motapp, webui->cam->device_id);
+        webui->cam->motapp->dbse_movies_getlist(webui->cam->device_id);
     }
 
     wact = webui->motapp->webcontrol_actions;

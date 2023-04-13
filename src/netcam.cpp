@@ -1471,17 +1471,17 @@ static void netcam_set_path (ctx_dev *cam, ctx_netcam *netcam )
     } else {
         MOTPLS_LOG(INF, TYPE_NETCAM, NO_ERRNO
             ,_("Setting up %s "),url.service);
-        if (userpass != NULL) {
+        //if (userpass != NULL) {
             netcam->path =(char*) mymalloc(strlen(url.service) + 3 + strlen(userpass)
                   + 1 + strlen(url.host) + 6 + strlen(url.path) + 2 );
             sprintf((char *)netcam->path, "%s://%s@%s:%d%s",
                     url.service, userpass, url.host, url.port, url.path);
-        } else {
+        /*} else {
             netcam->path =(char*) mymalloc(strlen(url.service) + 3 + strlen(url.host)
                   + 6 + strlen(url.path) + 2);
             sprintf((char *)netcam->path, "%s://%s:%d%s", url.service,
                 url.host, url.port, url.path);
-        }
+        }*/
     }
 
     sprintf(netcam->service, "%s",url.service);

@@ -384,8 +384,32 @@ struct ctx_snd_info {
     std::string                 trig_nm;
 };
 
-struct ctx_dev {
+typedef enum {
+    EVENT_FILECREATE = 1,
+    EVENT_MOTION,
+    EVENT_START,
+    EVENT_END,
+    EVENT_TLAPSE_START,
+    EVENT_TLAPSE_END,
+    EVENT_STREAM,
+    EVENT_IMAGE_DETECTED,
+    EVENT_IMAGEM_DETECTED,
+    EVENT_IMAGE_SNAPSHOT,
+    EVENT_IMAGE,
+    EVENT_IMAGEM,
+    EVENT_IMAGE_PREVIEW,
+    EVENT_FILECLOSE,
+    EVENT_AREA_DETECTED,
+    EVENT_CAMERA_LOST,
+    EVENT_CAMERA_FOUND,
+    EVENT_MOVIE_PUT,
+    EVENT_MOVIE_START,
+    EVENT_MOVIE_END,
+    EVENT_SECDETECT,
+    EVENT_LAST,
+} motion_event;
 
+struct ctx_dev {
     ctx_motapp      *motapp;
     int             threadnr;
     pthread_t       thread_id;
@@ -490,6 +514,31 @@ struct ctx_dev {
     ctx_snd_pulse           *snd_pulse; /* PulseAudio for sound*/
     ctx_snd_info            *snd_info;  /* Values for sound processing*/
 
+    void alg_diff();
+    void alg_noise_tune();
+    void alg_threshold_tune();
+    void alg_tune_smartmask();
+    void alg_update_reference_frame(int action);
+    void alg_stddev();
+    void alg_location();
+
+    void algsec_detect();
+    void algsec_init();
+    void algsec_deinit();
+
+    void event(motion_event evnt
+               ,ctx_image_data *img_data, char *fname,void *ftype, struct timespec *ts1);
+    const char * imageext();
+
+    void mlp_cleanup();
+
+    void dbse_exec(char *filename
+                   , int sqltype, timespec *ts1, const char *cmd);
+    void dbse_movies_addrec(ctx_movie *movie, timespec *ts1);
+
+    int movie_init_timelapse(timespec *ts1);
+    int movie_init_norm(timespec *ts1);
+    int movie_init_motion(timespec *ts1);
 };
 
 /*  ctx_motapp for whole motion application including all the cameras */
@@ -526,7 +575,19 @@ struct ctx_motapp {
     pthread_mutex_t     mutex_camlst;       /* Lock the list of cams while adding/removing */
     pthread_mutex_t     mutex_post;         /* mutex to allow for processing of post actions*/
 
+    void conf_init();
+    void conf_deinit();
+    void conf_parms_log();
+    void conf_parms_write();
+    void conf_camera_add();
 
+    void dbse_init();
+    void dbse_deinit();
+    void dbse_movies_getlist(int device_id);
+#if 0
+    void dbse_init_motpls();
+    void dbse_deinit_motpls();
+#endif
 };
 
 extern pthread_key_t tls_key_threadnr; /* key for thread number */

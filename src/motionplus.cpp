@@ -263,10 +263,9 @@ static void motpls_shutdown(ctx_motapp *motapp)
 
     webu_deinit(motapp);
 
-    dbse_deinit(motapp);
+    motapp->dbse_deinit();
 
-    conf_deinit(motapp);
-
+    motapp->conf_deinit();
 }
 
 static void motpls_device_ids(ctx_motapp *motapp)
@@ -397,7 +396,7 @@ static void motpls_startup(ctx_motapp *motapp, int daemonize)
 
     log_init_app(motapp);  /* This is needed prior to any function possibly calling motion_log*/
 
-    conf_init(motapp);
+        motapp->conf_init();
 
     log_init(motapp);
 
@@ -416,7 +415,7 @@ static void motpls_startup(ctx_motapp *motapp, int daemonize)
         MOTPLS_LOG(NTC, TYPE_ALL, NO_ERRNO,_("MotionPlus running in setup mode."));
     }
 
-    conf_parms_log(motapp);
+    motapp->conf_parms_log();
 
     motpls_pid_write(motapp);
 
@@ -424,7 +423,7 @@ static void motpls_startup(ctx_motapp *motapp, int daemonize)
 
     motpls_device_ids(motapp);
 
-    dbse_init(motapp);
+    motapp->dbse_init();
 
     draw_init_chars();
 
@@ -655,7 +654,7 @@ static void motpls_cam_add(ctx_motapp *motapp)
     }
 
     pthread_mutex_lock(&motapp->mutex_camlst);
-        conf_camera_add(motapp);
+        motapp->conf_camera_add();
     pthread_mutex_unlock(&motapp->mutex_camlst);
 
     indx = 1;

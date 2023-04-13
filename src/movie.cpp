@@ -41,6 +41,7 @@
 #include "netcam.hpp"
 #include "movie.hpp"
 
+namespace {
 
 static void movie_free_pkt(ctx_movie *movie)
 {
@@ -327,9 +328,18 @@ static int movie_encode_video(ctx_movie *movie)
         return 0;
 
     #endif
-
 }
+void movie_reset_start_time(ctx_movie *movie, const struct timespec *ts1)
+{
+        int64_t one_frame_interval = av_rescale_q(1,(AVRational){1, movie->fps}, movie->strm_video->time_base);
+        if (one_frame_interval <= 0) {
+            one_frame_interval = 1;
+        }
+        movie->base_pts = movie->last_pts + one_frame_interval;
 
+        movie->start_time.tv_sec = ts1->tv_sec;
+        movie->start_time.tv_nsec = ts1->tv_nsec;
+}
 static int movie_set_pts(ctx_movie *movie, const struct timespec *ts1)
 {
 
@@ -1357,39 +1367,6 @@ static int movie_passthru_open(ctx_movie *movie)
     return 0;
 }
 
-void movie_avcodec_log(void *ignoreme, int errno_flag, const char *fmt, va_list vl)
-{
-
-    char buf[1024];
-    char *end;
-    int retcd;
-
-    (void)ignoreme;
-    (void)errno_flag;
-
-    /* Valgrind occasionally reports use of uninitialized values in here when we interrupt
-     * some rtsp functions.  The offending value is either fmt or vl and seems to be from a
-     * debug level of av functions.  To address it we flatten the message after we know
-     * the log level.  Now we put the avcodec messages to INF level since their error
-     * are not necessarily our errors.
-     */
-
-    if (errno_flag <= AV_LOG_WARNING) {
-        retcd = vsnprintf(buf, sizeof(buf), fmt, vl);
-        if (retcd >=1024) {
-            MOTPLS_LOG(DBG, TYPE_ENCODER, NO_ERRNO, "av message truncated %d bytes",(retcd - 1024));
-        }
-        end = buf + strlen(buf);
-        if (end > buf && end[-1] == '\n') {
-            *--end = 0;
-        }
-        if (strstr(buf, "Will reconnect at") == NULL) {
-            MOTPLS_LOG(INF, TYPE_ENCODER, NO_ERRNO, "%s", buf);
-        }
-    }
-
-}
-
 static void movie_put_pix_nv21(ctx_movie *movie, ctx_image_data *img_data)
 {
     unsigned char *image,*imagecr, *imagecb;
@@ -1431,41 +1408,6 @@ static void movie_put_pix_yuv420(ctx_movie *movie, ctx_image_data *img_data)
     movie->picture->data[0] = image;
     movie->picture->data[1] = image + (movie->ctx_codec->width * movie->ctx_codec->height);
     movie->picture->data[2] = movie->picture->data[1] + ((movie->ctx_codec->width * movie->ctx_codec->height) / 4);
-
-}
-
-void movie_global_init(void)
-{
-
-    MOTPLS_LOG(NTC, TYPE_ENCODER, NO_ERRNO, _("libavcodec  version %d.%d.%d")
-        , LIBAVCODEC_VERSION_MAJOR, LIBAVCODEC_VERSION_MINOR, LIBAVCODEC_VERSION_MICRO);
-    MOTPLS_LOG(NTC, TYPE_ENCODER, NO_ERRNO, _("libavformat version %d.%d.%d")
-        , LIBAVFORMAT_VERSION_MAJOR, LIBAVFORMAT_VERSION_MINOR, LIBAVFORMAT_VERSION_MICRO);
-
-    #if (MYFFVER < 58000)
-        av_register_all();
-        avcodec_register_all();
-    #endif
-
-    avformat_network_init();
-    avdevice_register_all();
-    av_log_set_callback(movie_avcodec_log);
-
-}
-
-void movie_global_deinit(void)
-{
-
-    avformat_network_deinit();
-
-    #if (MYFFVER < 58000)
-        /* TODO Determine if this is even needed for old versions */
-        if (av_lockmgr_register(NULL) < 0) {
-            MOTPLS_LOG(EMG, TYPE_ALL, SHOW_ERRNO
-                ,_("av_lockmgr_register reset failed on cleanup"));
-        }
-    #endif
-
 
 }
 
@@ -1623,22 +1565,7 @@ int movie_put_image(ctx_movie *movie, ctx_image_data *img_data, const struct tim
             MOTPLS_LOG(DBG, TYPE_ENCODER, NO_ERRNO, _("Buffered packet"));
         }
     }
-
     return retcd;
-
-}
-
-void movie_reset_start_time(ctx_movie *movie, const struct timespec *ts1)
-{
-    int64_t one_frame_interval = av_rescale_q(1,(AVRational){1, movie->fps}, movie->strm_video->time_base);
-    if (one_frame_interval <= 0) {
-        one_frame_interval = 1;
-    }
-    movie->base_pts = movie->last_pts + one_frame_interval;
-
-    movie->start_time.tv_sec = ts1->tv_sec;
-    movie->start_time.tv_nsec = ts1->tv_nsec;
-
 }
 
 static const char* movie_init_container(ctx_dev *cam)
@@ -1897,5 +1824,104 @@ int movie_init_timelapse(ctx_dev *cam, struct timespec *ts1)
     }
 
     return retcd;
+}
 
+} // namespace
+
+void movie_global_init(void)
+{
+
+    MOTPLS_LOG(NTC, TYPE_ENCODER, NO_ERRNO, _("libavcodec  version %d.%d.%d")
+               , LIBAVCODEC_VERSION_MAJOR, LIBAVCODEC_VERSION_MINOR, LIBAVCODEC_VERSION_MICRO);
+    MOTPLS_LOG(NTC, TYPE_ENCODER, NO_ERRNO, _("libavformat version %d.%d.%d")
+               , LIBAVFORMAT_VERSION_MAJOR, LIBAVFORMAT_VERSION_MINOR, LIBAVFORMAT_VERSION_MICRO);
+
+#if (MYFFVER < 58000)
+    av_register_all();
+    avcodec_register_all();
+#endif
+
+    avformat_network_init();
+    avdevice_register_all();
+    av_log_set_callback(& ::movie_avcodec_log);
+}
+
+void movie_global_deinit(void)
+{
+
+    avformat_network_deinit();
+
+#if (MYFFVER < 58000)
+    /* TODO Determine if this is even needed for old versions */
+    if (av_lockmgr_register(NULL) < 0) {
+        MOTPLS_LOG(EMG, TYPE_ALL, SHOW_ERRNO
+                   ,_("av_lockmgr_register reset failed on cleanup"));
+    }
+#endif
+}
+
+void movie_avcodec_log(void *ignoreme, int errno_flag, const char *fmt, va_list vl)
+{
+
+    char buf[1024];
+    char *end;
+    int retcd;
+
+    (void)ignoreme;
+    (void)errno_flag;
+
+    /* Valgrind occasionally reports use of uninitialized values in here when we interrupt
+     * some rtsp functions.  The offending value is either fmt or vl and seems to be from a
+     * debug level of av functions.  To address it we flatten the message after we know
+     * the log level.  Now we put the avcodec messages to INF level since their error
+     * are not necessarily our errors.
+     */
+
+    if (errno_flag <= AV_LOG_WARNING) {
+        retcd = vsnprintf(buf, sizeof(buf), fmt, vl);
+        if (retcd >=1024) {
+            MOTPLS_LOG(DBG, TYPE_ENCODER, NO_ERRNO, "av message truncated %d bytes",(retcd - 1024));
+        }
+        end = buf + strlen(buf);
+        if (end > buf && end[-1] == '\n') {
+            *--end = 0;
+        }
+        if (strstr(buf, "Will reconnect at") == NULL) {
+            MOTPLS_LOG(INF, TYPE_ENCODER, NO_ERRNO, "%s", buf);
+        }
+    }
+}
+
+int ctx_movie::movie_open()
+{
+    return ::movie_open(this);
+}
+int ctx_movie::movie_put_image(ctx_image_data *img_data, const timespec *tv1)
+{
+    return ::movie_put_image(this, img_data, tv1);
+}
+void ctx_movie::movie_close()
+{
+    return ::movie_close(this);
+}
+void ctx_movie::movie_reset_start_time(const struct timespec *tv1)
+{
+    ::movie_reset_start_time(this, tv1);
+}
+void ctx_movie::movie_free()
+{
+    ::movie_free(this);
+}
+
+int ctx_dev::movie_init_timelapse(timespec *ts1)
+{
+    return ::movie_init_timelapse(this, ts1);
+}
+int ctx_dev::movie_init_norm(timespec *ts1)
+{
+    return ::movie_init_norm(this, ts1);
+}
+int ctx_dev::movie_init_motion(timespec *ts1)
+{
+    return ::movie_init_motion(this, ts1);
 }

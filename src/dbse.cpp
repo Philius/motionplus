@@ -24,6 +24,8 @@
 #include "movie.hpp"
 #include "dbse.hpp"
 
+namespace {
+
 /* Forward Declare */
 void dbse_close(ctx_motapp *motapp);
 
@@ -1383,3 +1385,38 @@ void dbse_movies_addrec(ctx_dev *cam, ctx_movie *movie, timespec *ts1)
 
 }
 
+} // namespace
+
+void ctx_motapp::dbse_init()
+{
+    ::dbse_init(this);
+}
+void ctx_motapp::dbse_deinit()
+{
+    ::dbse_deinit(this);
+}
+void ctx_motapp::dbse_movies_getlist(int device_id)
+{
+    ::dbse_movies_getlist(this, device_id);
+}
+
+void ctx_dev::dbse_exec(char *filename
+               , int sqltype, timespec *ts1, const char *cmd)
+{
+    ::dbse_exec(this, filename, sqltype, ts1, cmd);
+}
+void ctx_dev::dbse_movies_addrec(ctx_movie *movie, timespec *ts1)
+{
+    ::dbse_movies_addrec(this, movie, ts1);
+}
+#if 0
+void ctx_motapp::dbse_init_motpls()
+{
+    ::dbse_init_motpls(this);
+}
+
+void ctx_motapp::dbse_deinit_motpls()
+{
+    ::dbse_deinit_motpls(this);
+}
+#endif

@@ -735,7 +735,7 @@ static int v4l2_pixfmt_list(ctx_dev *cam, palette_item *palette_array)
 /* Find and select the pixel format for camera*/
 static void v4l2_palette_set(ctx_dev *cam)
 {
-    int indxp, indx, retcd;
+    int indxp, indx, retcd = 0;
     ctx_v4l2cam *v4l2cam = cam->v4l2cam;
     palette_item *palette_array;
 
@@ -751,11 +751,11 @@ static void v4l2_palette_set(ctx_dev *cam)
     for (indx = 0; indx < cam->v4l2cam->params->params_count; indx++) {
         if (mystreq(cam->v4l2cam->params->params_array[indx].param_name,"palette")) {
             indxp =  atoi(cam->v4l2cam->params->params_array[indx].param_value);
+            retcd = v4l2_pixfmt_set(cam, palette_array[indxp].v4l2id);
             break;
         }
     }
 
-    retcd = v4l2_pixfmt_set(cam, palette_array[indxp].v4l2id);
     if (retcd == 0) {
         myfree(&palette_array);
         return;

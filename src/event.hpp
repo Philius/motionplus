@@ -19,36 +19,13 @@
 #ifndef _INCLUDE_EVENT_HPP_
 #define _INCLUDE_EVENT_HPP_
 
-typedef enum {
-    EVENT_FILECREATE = 1,
-    EVENT_MOTION,
-    EVENT_START,
-    EVENT_END,
-    EVENT_TLAPSE_START,
-    EVENT_TLAPSE_END,
-    EVENT_STREAM,
-    EVENT_IMAGE_DETECTED,
-    EVENT_IMAGEM_DETECTED,
-    EVENT_IMAGE_SNAPSHOT,
-    EVENT_IMAGE,
-    EVENT_IMAGEM,
-    EVENT_IMAGE_PREVIEW,
-    EVENT_FILECLOSE,
-    EVENT_AREA_DETECTED,
-    EVENT_CAMERA_LOST,
-    EVENT_CAMERA_FOUND,
-    EVENT_MOVIE_PUT,
-    EVENT_MOVIE_START,
-    EVENT_MOVIE_END,
-    EVENT_SECDETECT,
-    EVENT_LAST,
-} motion_event;
+#include "motionplus.hpp"
 
 typedef void(* event_handler)(ctx_dev *cam, motion_event, ctx_image_data *,
              char *, void *, struct timespec *);
-
+/*
 void event(ctx_dev *cam, motion_event evnt
            ,ctx_image_data *img_data, char *fname,void *ftype, struct timespec *ts1);
 const char * imageext(ctx_dev *cam);
-
+*/
 #endif /* _INCLUDE_EVENT_HPP_ */

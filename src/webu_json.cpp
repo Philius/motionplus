@@ -40,7 +40,7 @@ static void webu_json_config_item(ctx_webui *webui, ctx_config *conf, int indx_p
         parm_enable = "true";
     }
 
-    conf_edit_get(conf, config_parms[indx_parm].parm_name
+    conf->conf_edit_get(config_parms[indx_parm].parm_name
         , parm_orig, config_parms[indx_parm].parm_cat);
 
     if (parm_orig.find("\"") != std::string::npos) {
@@ -85,7 +85,7 @@ static void webu_json_config_item(ctx_webui *webui, ctx_config *conf, int indx_p
                 "}";
         }
     } else if (config_parms[indx_parm].parm_type == PARM_TYP_LIST) {
-        conf_edit_list(conf, config_parms[indx_parm].parm_name
+        conf->conf_edit_list(config_parms[indx_parm].parm_name
             , parm_list, config_parms[indx_parm].parm_cat);
 
         webui->resp_page +=
@@ -216,8 +216,8 @@ static void webu_json_config_categories(ctx_webui *webui)
         }
         webui->resp_page += "\"" + std::to_string(indx_cat) + "\": ";
 
-        catnm_long = conf_cat_desc((enum PARM_CAT)indx_cat, false);
-        catnm_short = conf_cat_desc((enum PARM_CAT)indx_cat, true);
+        catnm_long = conf_cat_desc(PARM_CAT(indx_cat), false);
+        catnm_short = conf_cat_desc(PARM_CAT(indx_cat), true);
 
         webui->resp_page += "{\"name\":\"" + catnm_short + "\",\"display\":\"" + catnm_long + "\"}";
 
@@ -290,7 +290,7 @@ static void webu_json_movies_list(ctx_webui *webui)
         }
     }
 
-    dbse_movies_getlist(webui->motapp, webui->cam->device_id);
+    webui->motapp->dbse_movies_getlist(webui->cam->device_id);
 
     movie_cnt = webui->motapp->dbse->movie_cnt;
     webui->resp_page += "{";

@@ -24,7 +24,10 @@
 #ifndef _INCLUDE_DBSE_HPP_
 #define _INCLUDE_DBSE_HPP_
 
-    #ifdef HAVE_MYSQL
+#include "motionplus.hpp"
+#include <cstdint>
+#include <string>
+#ifdef HAVE_MYSQL
         #include <mysql.h>
         #ifndef HAVE_DBSE
             #define HAVE_DBSE
@@ -120,7 +123,7 @@
         bool                is_open;
 
     };
-
+/*
     void dbse_init(ctx_motapp *motapp);
     void dbse_init_motpls(ctx_motapp *motapp);
     void dbse_deinit(ctx_motapp *motapp);
@@ -129,5 +132,5 @@
         , int sqltype, timespec *ts1, const char *cmd);
     void dbse_movies_getlist(ctx_motapp *motapp, int device_id);
     void dbse_movies_addrec(ctx_dev *cam, ctx_movie *movie, timespec *ts1);
-
+*/
 #endif /* _INCLUDE_DBSE_HPP_ */

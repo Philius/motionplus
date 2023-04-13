@@ -24,17 +24,6 @@
 #include "logger.hpp"
 #include "conf.hpp"
 
-
-enum PARM_ACT{
-    PARM_ACT_DFLT
-    , PARM_ACT_SET
-    , PARM_ACT_GET
-    , PARM_ACT_LIST
-};
-
-/* Forward Declares */
-void conf_process(ctx_motapp *motapp, ctx_config *conf);
-
 /*Configuration parameters */
 ctx_parm config_parms[] = {
     {"daemon",                    PARM_TYP_BOOL,   PARM_CAT_00, WEBUI_LEVEL_ADVANCED },
@@ -209,7 +198,7 @@ ctx_parm config_parms[] = {
     {"snd_window",                PARM_TYP_LIST, PARM_CAT_18, WEBUI_LEVEL_ADVANCED },
     {"snd_show",                  PARM_TYP_BOOL, PARM_CAT_18, WEBUI_LEVEL_ADVANCED },
 
-    { "", (enum PARM_TYP)0, (enum PARM_CAT)0, (enum WEBUI_LEVEL)0 }
+    { "", (enum PARM_TYP)0, (PARM_CAT)0, (enum WEBUI_LEVEL)0 }
 };
 
 /*
@@ -226,217 +215,229 @@ ctx_parm config_parms[] = {
 /* Array of deprecated config options */
 ctx_parm_depr config_parms_depr[] = {
     {
-    "thread",
-    "3.4.1",
-    "The \"thread\" option has been replaced by the \"camera\"",
-    "camera"
+        "thread",
+        "3.4.1",
+        "The \"thread\" option has been replaced by the \"camera\"",
+        "camera"
     },
     {
-    "ffmpeg_timelapse",
-    "4.0.1",
-    "\"ffmpeg_timelapse\" replaced with \"timelapse_interval\"",
-    "timelapse_interval"
+        "ffmpeg_timelapse",
+        "4.0.1",
+        "\"ffmpeg_timelapse\" replaced with \"timelapse_interval\"",
+        "timelapse_interval"
     },
     {
-    "ffmpeg_timelapse_mode",
-    "4.0.1",
-    "\"ffmpeg_timelapse_mode\" replaced with \"timelapse_mode\"",
-    "timelapse_mode"
+        "ffmpeg_timelapse_mode",
+        "4.0.1",
+        "\"ffmpeg_timelapse_mode\" replaced with \"timelapse_mode\"",
+        "timelapse_mode"
     },
     {
-    "brightness",
-    "4.1.1",
-    "\"brightness\" replaced with \"v4l2_params\"",
-    "v4l2_params"
+        "brightness",
+        "4.1.1",
+        "\"brightness\" replaced with \"v4l2_params\"",
+        "v4l2_params"
     },
     {
-    "contrast",
-    "4.1.1",
-    "\"contrast\" replaced with \"v4l2_params\"",
-    "v4l2_params"
+        "contrast",
+        "4.1.1",
+        "\"contrast\" replaced with \"v4l2_params\"",
+        "v4l2_params"
     },
     {
-    "saturation",
-    "4.1.1",
-    "\"saturation\" replaced with \"v4l2_params\"",
-    "v4l2_params"
+        "saturation",
+        "4.1.1",
+        "\"saturation\" replaced with \"v4l2_params\"",
+        "v4l2_params"
     },
     {
-    "hue",
-    "4.1.1",
-    "\"hue\" replaced with \"v4l2_params\"",
-    "v4l2_params"
+        "hue",
+        "4.1.1",
+        "\"hue\" replaced with \"v4l2_params\"",
+        "v4l2_params"
     },
     {
-    "power_line_frequency",
-    "4.1.1",
-    "\"power_line_frequency\" replaced with \"v4l2_params\"",
-    "v4l2_params"
+        "power_line_frequency",
+        "4.1.1",
+        "\"power_line_frequency\" replaced with \"v4l2_params\"",
+        "v4l2_params"
     },
     {
-    "text_double",
-    "4.1.1",
-    "\"text_double\" replaced with \"text_scale\"",
-    "text_scale"
+        "text_double",
+        "4.1.1",
+        "\"text_double\" replaced with \"text_scale\"",
+        "text_scale"
     },
     {
-    "webcontrol_html_output",
-    "4.1.1",
-    "\"webcontrol_html_output\" replaced with \"webcontrol_interface\"",
-    "webcontrol_interface"
+        "webcontrol_html_output",
+        "4.1.1",
+        "\"webcontrol_html_output\" replaced with \"webcontrol_interface\"",
+        "webcontrol_interface"
     },
     {
-     "lightswitch",
-    "4.1.1",
-    "\"lightswitch\" replaced with \"lightswitch_percent\"",
-    "lightswitch_percent"
+        "lightswitch",
+        "4.1.1",
+        "\"lightswitch\" replaced with \"lightswitch_percent\"",
+        "lightswitch_percent"
     },
     {
-    "ffmpeg_output_movies",
-    "4.1.1",
-    "\"ffmpeg_output_movies\" replaced with \"movie_output\"",
-    "movie_output"
+        "ffmpeg_output_movies",
+        "4.1.1",
+        "\"ffmpeg_output_movies\" replaced with \"movie_output\"",
+        "movie_output"
     },
     {
-    "ffmpeg_output_debug_movies",
-    "4.1.1",
-    "\"ffmpeg_output_debug_movies\" replaced with \"movie_output_motion\"",
-    "movie_output_motion"
+        "ffmpeg_output_debug_movies",
+        "4.1.1",
+        "\"ffmpeg_output_debug_movies\" replaced with \"movie_output_motion\"",
+        "movie_output_motion"
     },
     {
-    "max_movie_time",
-    "4.1.1",
-    "\"max_movie_time\" replaced with \"movie_max_time\"",
-    "movie_max_time"
+        "max_movie_time",
+        "4.1.1",
+        "\"max_movie_time\" replaced with \"movie_max_time\"",
+        "movie_max_time"
     },
     {
-    "ffmpeg_bps",
-    "4.1.1",
-    "\"ffmpeg_bps\" replaced with \"movie_bps\"",
-    "movie_bps"
+        "ffmpeg_bps",
+        "4.1.1",
+        "\"ffmpeg_bps\" replaced with \"movie_bps\"",
+        "movie_bps"
     },
     {
-    "ffmpeg_variable_bitrate",
-    "4.1.1",
-    "\"ffmpeg_variable_bitrate\" replaced with \"movie_quality\"",
-    "movie_quality"
+        "ffmpeg_variable_bitrate",
+        "4.1.1",
+        "\"ffmpeg_variable_bitrate\" replaced with \"movie_quality\"",
+        "movie_quality"
     },
     {
-    "ffmpeg_video_codec",
-    "4.1.1",
-    "\"ffmpeg_video_codec\" replaced with \"movie_container\"",
-    "movie_container"
+        "ffmpeg_video_codec",
+        "4.1.1",
+        "\"ffmpeg_video_codec\" replaced with \"movie_container\"",
+        "movie_container"
     },
     {
-    "ffmpeg_passthrough",
-    "4.1.1",
-    "\"ffmpeg_passthrough\" replaced with \"movie_passthrough\"",
-    "movie_passthrough"
+        "ffmpeg_passthrough",
+        "4.1.1",
+        "\"ffmpeg_passthrough\" replaced with \"movie_passthrough\"",
+        "movie_passthrough"
     },
     {
-    "use_extpipe",
-    "4.1.1",
-    "\"use_extpipe\" replaced with \"movie_extpipe_use\"",
-    "movie_extpipe_use"
+        "use_extpipe",
+        "4.1.1",
+        "\"use_extpipe\" replaced with \"movie_extpipe_use\"",
+        "movie_extpipe_use"
     },
     {
-    "extpipe",
-    "4.1.1",
-    "\"extpipe\" replaced with \"movie_extpipe\"",
-    "movie_extpipe"
+        "extpipe",
+        "4.1.1",
+        "\"extpipe\" replaced with \"movie_extpipe\"",
+        "movie_extpipe"
     },
     {
-    "output_pictures",
-    "4.1.1",
-    "\"output_pictures\" replaced with \"picture_output\"",
-    "picture_output"
+        "output_pictures",
+        "4.1.1",
+        "\"output_pictures\" replaced with \"picture_output\"",
+        "picture_output"
     },
     {
-    "output_debug_pictures",
-    "4.1.1",
-    "\"output_debug_pictures\" replaced with \"picture_output_motion\"",
-    "picture_output_motion"
+        "output_debug_pictures",
+        "4.1.1",
+        "\"output_debug_pictures\" replaced with \"picture_output_motion\"",
+        "picture_output_motion"
     },
     {
-    "quality",
-    "4.1.1",
-    "\"quality\" replaced with \"picture_quality\"",
-    "picture_quality"
+        "quality",
+        "4.1.1",
+        "\"quality\" replaced with \"picture_quality\"",
+        "picture_quality"
     },
     {
-    "exif_text",
-    "4.1.1",
-    "\"exif_text\" replaced with \"picture_exif\"",
-    "picture_exif"
+        "exif_text",
+        "4.1.1",
+        "\"exif_text\" replaced with \"picture_exif\"",
+        "picture_exif"
     },
     {
-    "motion_video_pipe",
-    "4.1.1",
-    "\"motion_video_pipe\" replaced with \"video_pipe_motion\"",
-    "video_pipe_motion"
+        "motion_video_pipe",
+        "4.1.1",
+        "\"motion_video_pipe\" replaced with \"video_pipe_motion\"",
+        "video_pipe_motion"
     },
     {
-    "ipv6_enabled",
-    "4.1.1",
-    "\"ipv6_enabled\" replaced with \"webcontrol_ipv6\"",
-    "webcontrol_ipv6"
+        "ipv6_enabled",
+        "4.1.1",
+        "\"ipv6_enabled\" replaced with \"webcontrol_ipv6\"",
+        "webcontrol_ipv6"
     },
     {
-    "rtsp_uses_tcp",
-    "4.1.1",
-    "\"rtsp_uses_tcp\" replaced with \"netcam_use_tcp\"",
-    "netcam_use_tcp"
+        "rtsp_uses_tcp",
+        "4.1.1",
+        "\"rtsp_uses_tcp\" replaced with \"netcam_use_tcp\"",
+        "netcam_use_tcp"
     },
     {
-    "switchfilter",
-    "4.1.1",
-    "\"switchfilter\" replaced with \"roundrobin_switchfilter\"",
-    "roundrobin_switchfilter"
+        "switchfilter",
+        "4.1.1",
+        "\"switchfilter\" replaced with \"roundrobin_switchfilter\"",
+        "roundrobin_switchfilter"
     },
     {
-    "logfile",
-    "4.1.1",
-    "\"logfile\" replaced with \"log_file\"",
-    "log_file"
+        "logfile",
+        "4.1.1",
+        "\"logfile\" replaced with \"log_file\"",
+        "log_file"
     },
     {
-    "process_id_file",
-    "4.1.1",
-    "\"process_id_file\" replaced with \"pid_file\"",
-    "pid_file"
+        "process_id_file",
+        "4.1.1",
+        "\"process_id_file\" replaced with \"pid_file\"",
+        "pid_file"
     },
     {
-    "movie_codec",
-    "0.0.1",
-    "\"movie_codec\" replaced with \"movie_container\"",
-    "movie_container"
+        "movie_codec",
+        "0.0.1",
+        "\"movie_codec\" replaced with \"movie_container\"",
+        "movie_container"
     },
     {
-    "camera_id",
-    "0.0.1",
-    "\"camera_id\" replaced with \"device_id\"",
-    "device_id"
+        "camera_id",
+        "0.0.1",
+        "\"camera_id\" replaced with \"device_id\"",
+        "device_id"
     },
     {
-    "camera_name",
-    "0.0.1",
-    "\"camera_name\" replaced with \"device_name\"",
-    "device_name"
+        "camera_name",
+        "0.0.1",
+        "\"camera_name\" replaced with \"device_name\"",
+        "device_name"
     },
     {
-    "camera_tmo",
-    "0.0.1",
-    "\"camera_tmo\" replaced with \"device_tmo\"",
-    "device_tmo"
+        "camera_tmo",
+        "0.0.1",
+        "\"camera_tmo\" replaced with \"device_tmo\"",
+        "device_tmo"
     },
     {
-    "libcam_name",
-    "0.0.1",
-    "\"libcam_name\" replaced with \"libcam_device\"",
-    "libcam_device"
+        "libcam_name",
+        "0.0.1",
+        "\"libcam_name\" replaced with \"libcam_device\"",
+        "libcam_device"
     },
     { "","","",""}
 };
+
+namespace {
+
+enum PARM_ACT{
+    PARM_ACT_DFLT
+    , PARM_ACT_SET
+    , PARM_ACT_GET
+    , PARM_ACT_LIST
+};
+
+/* Forward Declares */
+void conf_process(ctx_motapp *motapp, ctx_config *conf);
 
 static void conf_edit_set_bool(bool &parm_dest, std::string &parm_in)
 {
@@ -3265,7 +3266,7 @@ static void conf_edit_cat18(ctx_config *conf, std::string parm_nm
 }
 
 static void conf_edit_cat(ctx_config *conf, std::string parm_nm
-        ,std::list<std::string> &parm_val, enum PARM_ACT pact, enum PARM_CAT pcat)
+        ,std::list<std::string> &parm_val, enum PARM_ACT pact, PARM_CAT pcat)
 {
     if (pcat == PARM_CAT_18) {
         conf_edit_cat18(conf, parm_nm, parm_val, pact);
@@ -3273,7 +3274,7 @@ static void conf_edit_cat(ctx_config *conf, std::string parm_nm
 }
 
 static void conf_edit_cat(ctx_config *conf, std::string parm_nm
-        , std::string &parm_val, enum PARM_ACT pact, enum PARM_CAT pcat)
+        , std::string &parm_val, enum PARM_ACT pact, PARM_CAT pcat)
 {
     if (pcat == PARM_CAT_00) {          conf_edit_cat00(conf, parm_nm, parm_val, pact);
     } else if (pcat == PARM_CAT_01) {   conf_edit_cat01(conf, parm_nm, parm_val, pact);
@@ -3316,7 +3317,7 @@ int conf_edit_set_active(ctx_config *conf
         , std::string parm_nm, std::string parm_val)
 {
     int indx;
-    enum PARM_CAT pcat;
+    PARM_CAT pcat;
 
     indx = 0;
     while (config_parms[indx].parm_name != "") {
@@ -3415,13 +3416,13 @@ static int conf_edit_set_depr(ctx_config *conf, std::string &parm_nm
     return -1;
 }
 
-void conf_edit_get(ctx_config *conf, std::string parm_nm, std::string &parm_val, enum PARM_CAT parm_cat)
+void conf_edit_get(ctx_config *conf, std::string parm_nm, std::string &parm_val, PARM_CAT parm_cat)
 {
     conf_edit_cat(conf, parm_nm, parm_val, PARM_ACT_GET, parm_cat);
 }
 
 void conf_edit_get(ctx_config *conf, std::string parm_nm
-    , std::list<std::string> &parm_val, enum PARM_CAT parm_cat)
+    , std::list<std::string> &parm_val, PARM_CAT parm_cat)
 {
     conf_edit_cat(conf, parm_nm, parm_val, PARM_ACT_GET, parm_cat);
 }
@@ -3441,73 +3442,14 @@ void conf_edit_set(ctx_config *conf, std::string parm_nm
     MOTPLS_LOG(ALR, TYPE_ALL, NO_ERRNO, _("Unknown config option \"%s\""), parm_nm.c_str());
 }
 
+#if 0
 /* Get list of valid values for items only permitting a set*/
 void conf_edit_list(ctx_config *conf, std::string parm_nm, std::string &parm_val
-        , enum PARM_CAT parm_cat)
+        , PARM_CAT parm_cat)
 {
     conf_edit_cat(conf, parm_nm, parm_val, PARM_ACT_LIST, parm_cat);
 }
-
-std::string conf_type_desc(enum PARM_TYP ptype)
-{
-    if (ptype == PARM_TYP_BOOL) {           return "bool";
-    } else if (ptype == PARM_TYP_INT) {     return "int";
-    } else if (ptype == PARM_TYP_LIST) {    return "list";
-    } else if (ptype == PARM_TYP_STRING) {  return "string";
-    } else if (ptype == PARM_TYP_ARRAY) {   return "array";
-    } else {                                return "error";
-    }
-}
-
-/* Return a string describing the parameter category */
-std::string conf_cat_desc(enum PARM_CAT pcat, bool shrt) {
-
-    if (shrt) {
-        if (pcat == PARM_CAT_00)        { return "system";
-        } else if (pcat == PARM_CAT_01) { return "camera";
-        } else if (pcat == PARM_CAT_02) { return "source";
-        } else if (pcat == PARM_CAT_03) { return "image";
-        } else if (pcat == PARM_CAT_04) { return "overlay";
-        } else if (pcat == PARM_CAT_05) { return "method";
-        } else if (pcat == PARM_CAT_06) { return "masks";
-        } else if (pcat == PARM_CAT_07) { return "detect";
-        } else if (pcat == PARM_CAT_08) { return "scripts";
-        } else if (pcat == PARM_CAT_09) { return "picture";
-        } else if (pcat == PARM_CAT_10) { return "movie";
-        } else if (pcat == PARM_CAT_11) { return "timelapse";
-        } else if (pcat == PARM_CAT_12) { return "pipes";
-        } else if (pcat == PARM_CAT_13) { return "webcontrol";
-        } else if (pcat == PARM_CAT_14) { return "streams";
-        } else if (pcat == PARM_CAT_15) { return "database";
-        } else if (pcat == PARM_CAT_16) { return "sql";
-        } else if (pcat == PARM_CAT_17) { return "track";
-        } else if (pcat == PARM_CAT_18) { return "sound";
-        } else { return "unk";
-        }
-    } else {
-        if (pcat == PARM_CAT_00)        { return "System";
-        } else if (pcat == PARM_CAT_01) { return "Camera";
-        } else if (pcat == PARM_CAT_02) { return "Source";
-        } else if (pcat == PARM_CAT_03) { return "Image";
-        } else if (pcat == PARM_CAT_04) { return "Overlays";
-        } else if (pcat == PARM_CAT_05) { return "Method";
-        } else if (pcat == PARM_CAT_06) { return "Masks";
-        } else if (pcat == PARM_CAT_07) { return "Detection";
-        } else if (pcat == PARM_CAT_08) { return "Scripts";
-        } else if (pcat == PARM_CAT_09) { return "Picture";
-        } else if (pcat == PARM_CAT_10) { return "Movie";
-        } else if (pcat == PARM_CAT_11) { return "Timelapse";
-        } else if (pcat == PARM_CAT_12) { return "Pipes";
-        } else if (pcat == PARM_CAT_13) { return "Web Control";
-        } else if (pcat == PARM_CAT_14) { return "Web Stream";
-        } else if (pcat == PARM_CAT_15) { return "Database";
-        } else if (pcat == PARM_CAT_16) { return "SQL";
-        } else if (pcat == PARM_CAT_17) { return "Tracking";
-        } else if (pcat == PARM_CAT_18) { return "Sound";
-        } else { return "Other";
-        }
-    }
-}
+#endif
 
 /** Prints usage and options allowed from Command-line. */
 static void usage(void)
@@ -3880,7 +3822,7 @@ void conf_parms_log(ctx_motapp *motapp)
     std::string parm_vl, parm_main, parm_nm;
     std::list<std::string> parm_array;
     std::list<std::string>::iterator it;
-    enum PARM_CAT parm_ct;
+    PARM_CAT parm_ct;
     enum PARM_TYP parm_typ;
 
     MOTPLS_LOG(INF, TYPE_ALL, NO_ERRNO
@@ -3967,9 +3909,9 @@ void conf_parms_log(ctx_motapp *motapp)
 }
 
 void conf_parms_write_parms(FILE *conffile, std::string parm_nm
-    , std::string parm_vl, enum PARM_CAT parm_ct, bool reset)
+    , std::string parm_vl, PARM_CAT parm_ct, bool reset)
 {
-    static enum PARM_CAT prev_ct;
+    static PARM_CAT prev_ct;
 
     if (reset) {
         prev_ct = PARM_CAT_00;
@@ -3978,7 +3920,7 @@ void conf_parms_write_parms(FILE *conffile, std::string parm_nm
 
     if (parm_ct != prev_ct) {
         fprintf(conffile,"\n%s",";*************************************************\n");
-        fprintf(conffile,"%s%s\n", ";*****   ", conf_cat_desc(parm_ct,false).c_str());
+        fprintf(conffile,"%s%s\n", ";*****   ", conf_cat_desc(parm_ct, false).c_str());
         fprintf(conffile,"%s",";*************************************************\n");
         prev_ct = parm_ct;
     }
@@ -3996,7 +3938,7 @@ void conf_parms_write_app(ctx_motapp *motapp)
     std::string parm_vl, parm_main, parm_nm;
     std::list<std::string> parm_array;
     std::list<std::string>::iterator it;
-    enum PARM_CAT parm_ct;
+    PARM_CAT parm_ct;
     enum PARM_TYP parm_typ;
     char timestamp[32];
     FILE *conffile;
@@ -4008,7 +3950,7 @@ void conf_parms_write_app(ctx_motapp *motapp)
     if (conffile == NULL) {
         MOTPLS_LOG(NTC, TYPE_ALL, NO_ERRNO
             , _("Failed to write configuration to %s")
-            , motapp->conf->conf_filename);
+            , motapp->conf->conf_filename.c_str());
         return;
     }
 
@@ -4075,7 +4017,7 @@ void conf_parms_write_cam(ctx_motapp *motapp)
     std::string parm_vl, parm_main, parm_nm;
     std::list<std::string> parm_array;
     std::list<std::string>::iterator it;
-    enum PARM_CAT parm_ct;
+    PARM_CAT parm_ct;
     enum PARM_TYP parm_typ;
     char timestamp[32];
     FILE *conffile;
@@ -4135,7 +4077,7 @@ void conf_parms_write_snd(ctx_motapp *motapp)
     std::string parm_vl, parm_main, parm_nm;
     std::list<std::string> parm_array;
     std::list<std::string>::iterator it;
-    enum PARM_CAT parm_ct;
+    PARM_CAT parm_ct;
     enum PARM_TYP parm_typ;
     char timestamp[32];
     FILE *conffile;
@@ -4281,3 +4223,107 @@ void conf_deinit(ctx_motapp *motapp)
 
 }
 
+} // namespace
+
+std::string conf_type_desc(PARM_TYP ptype)
+{
+    if (ptype == PARM_TYP_BOOL) {           return "bool";
+    } else if (ptype == PARM_TYP_INT) {     return "int";
+    } else if (ptype == PARM_TYP_LIST) {    return "list";
+    } else if (ptype == PARM_TYP_STRING) {  return "string";
+    } else if (ptype == PARM_TYP_ARRAY) {   return "array";
+    } else {                                return "error";
+    }
+}
+
+/* Return a string describing the parameter category */
+std::string conf_cat_desc(PARM_CAT pcat, bool shrt)
+{
+    if (shrt) {
+        if (pcat == PARM_CAT_00)        { return "system";
+        } else if (pcat == PARM_CAT_01) { return "camera";
+        } else if (pcat == PARM_CAT_02) { return "source";
+        } else if (pcat == PARM_CAT_03) { return "image";
+        } else if (pcat == PARM_CAT_04) { return "overlay";
+        } else if (pcat == PARM_CAT_05) { return "method";
+        } else if (pcat == PARM_CAT_06) { return "masks";
+        } else if (pcat == PARM_CAT_07) { return "detect";
+        } else if (pcat == PARM_CAT_08) { return "scripts";
+        } else if (pcat == PARM_CAT_09) { return "picture";
+        } else if (pcat == PARM_CAT_10) { return "movie";
+        } else if (pcat == PARM_CAT_11) { return "timelapse";
+        } else if (pcat == PARM_CAT_12) { return "pipes";
+        } else if (pcat == PARM_CAT_13) { return "webcontrol";
+        } else if (pcat == PARM_CAT_14) { return "streams";
+        } else if (pcat == PARM_CAT_15) { return "database";
+        } else if (pcat == PARM_CAT_16) { return "sql";
+        } else if (pcat == PARM_CAT_17) { return "track";
+        } else if (pcat == PARM_CAT_18) { return "sound";
+        } else { return "unk";
+        }
+    } else {
+        if (pcat == PARM_CAT_00)        { return "System";
+        } else if (pcat == PARM_CAT_01) { return "Camera";
+        } else if (pcat == PARM_CAT_02) { return "Source";
+        } else if (pcat == PARM_CAT_03) { return "Image";
+        } else if (pcat == PARM_CAT_04) { return "Overlays";
+        } else if (pcat == PARM_CAT_05) { return "Method";
+        } else if (pcat == PARM_CAT_06) { return "Masks";
+        } else if (pcat == PARM_CAT_07) { return "Detection";
+        } else if (pcat == PARM_CAT_08) { return "Scripts";
+        } else if (pcat == PARM_CAT_09) { return "Picture";
+        } else if (pcat == PARM_CAT_10) { return "Movie";
+        } else if (pcat == PARM_CAT_11) { return "Timelapse";
+        } else if (pcat == PARM_CAT_12) { return "Pipes";
+        } else if (pcat == PARM_CAT_13) { return "Web Control";
+        } else if (pcat == PARM_CAT_14) { return "Web Stream";
+        } else if (pcat == PARM_CAT_15) { return "Database";
+        } else if (pcat == PARM_CAT_16) { return "SQL";
+        } else if (pcat == PARM_CAT_17) { return "Tracking";
+        } else if (pcat == PARM_CAT_18) { return "Sound";
+        } else { return "Other";
+        }
+    }
+}
+
+void ctx_motapp::conf_init()
+{
+    ::conf_init(this);
+}
+void ctx_motapp::conf_deinit()
+{
+    ::conf_deinit(this);
+}
+void ctx_motapp::conf_parms_log()
+{
+    ::conf_parms_log(this);
+}
+void ctx_motapp::conf_parms_write()
+{
+    ::conf_parms_write(this);
+}
+void ctx_motapp::conf_camera_add()
+{
+    ::conf_camera_add(this);
+}
+
+void ctx_config::conf_edit_set(std::string parm_nm
+                   , std::string parm_val)
+{
+    ::conf_edit_set(this, parm_nm, parm_val);
+}
+void ctx_config::conf_edit_get(std::string parm_nm
+                   , std::string &parm_val, PARM_CAT parm_cat)
+{
+    ::conf_edit_get(this, parm_nm, parm_val, parm_cat);
+}
+void ctx_config::conf_edit_get(std::string parm_nm
+                   , std::list<std::string> &parm_val, PARM_CAT parm_cat)
+{
+    ::conf_edit_get(this, parm_nm, parm_val, parm_cat);
+}
+void ctx_config::conf_edit_list(std::string parm_nm
+                    , std::string &parm_val, PARM_CAT parm_cat)
+{
+    ::conf_edit_get(this, parm_nm, parm_val, parm_cat);
+}

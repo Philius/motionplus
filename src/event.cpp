@@ -22,15 +22,14 @@
 #include "logger.hpp"
 #include "util.hpp"
 #include "picture.hpp"
-#include "netcam.hpp"
 #include "movie.hpp"
 #include "event.hpp"
-#include "dbse.hpp"
 #include "video_loopback.hpp"
-#include "video_common.hpp"
 #include "webu_stream.hpp"
 #include "alg_sec.hpp"
 
+namespace {
+#if 0
 const char *eventList[] = {
     "NULL",
     "EVENT_FILECREATE",
@@ -54,7 +53,7 @@ const char *eventList[] = {
     "EVENT_MOVIE_PUT",
     "EVENT_LAST"
 };
-
+#endif
 static void event_newfile(ctx_dev *cam, motion_event evnt
         ,ctx_image_data *img_data, char *fname, void *ftype, struct timespec *ts1)
 {
@@ -221,8 +220,8 @@ static void event_image_detect(ctx_dev *cam, motion_event evnt
         } else {
             pic_save_norm(cam, fullfilename,img_data->image_norm, FTYPE_IMAGE);
         }
-        event(cam, EVENT_FILECREATE, NULL, fullfilename, (void *)FTYPE_IMAGE, ts1);
-        dbse_exec(cam, fullfilename, FTYPE_IMAGE, ts1, "pic_save");
+        cam->event(EVENT_FILECREATE, NULL, fullfilename, (void *)FTYPE_IMAGE, ts1);
+        cam->dbse_exec(fullfilename, FTYPE_IMAGE, ts1, "pic_save");
     }
 }
 
@@ -249,8 +248,8 @@ static void event_imagem_detect(ctx_dev *cam, motion_event evnt
             return;
         }
         pic_save_norm(cam, fullfilename, cam->imgs.image_motion.image_norm, FTYPE_IMAGE_MOTION);
-        event(cam, EVENT_FILECREATE, NULL, fullfilename, (void *)FTYPE_IMAGE_MOTION, ts1);
-        dbse_exec(cam, fullfilename, FTYPE_IMAGE_MOTION, ts1, "pic_save");
+        cam->event(EVENT_FILECREATE, NULL, fullfilename, (void *)FTYPE_IMAGE_MOTION, ts1);
+        cam->dbse_exec(fullfilename, FTYPE_IMAGE_MOTION, ts1, "pic_save");
     } else if (cam->conf->picture_output_motion == "roi") {
         mystrftime(cam, filename, sizeof(filename), cam->conf->picture_filename.c_str(), ts1, NULL, 0);
         retcd = snprintf(fullfilename, PATH_MAX, "%s/%sr.%s"
@@ -261,8 +260,8 @@ static void event_imagem_detect(ctx_dev *cam, motion_event evnt
             return;
         }
         pic_save_roi(cam, fullfilename, cam->current_image->image_norm);
-        event(cam, EVENT_FILECREATE, NULL, fullfilename, (void *)FTYPE_IMAGE_ROI, ts1);
-        dbse_exec(cam, fullfilename, FTYPE_IMAGE_ROI, ts1, "pic_save");
+        cam->event(EVENT_FILECREATE, NULL, fullfilename, (void *)FTYPE_IMAGE_ROI, ts1);
+        cam->dbse_exec(fullfilename, FTYPE_IMAGE_ROI, ts1, "pic_save");
     }
 }
 
@@ -298,8 +297,8 @@ static void event_image_snapshot(ctx_dev *cam, motion_event evnt
         }
 
         pic_save_norm(cam, fullfilename, img_data->image_norm, FTYPE_IMAGE_SNAPSHOT);
-        event(cam, EVENT_FILECREATE, NULL, fullfilename, (void *)FTYPE_IMAGE_SNAPSHOT, ts1);
-        dbse_exec(cam, fullfilename, FTYPE_IMAGE_SNAPSHOT, ts1, "pic_save");
+        cam->event(EVENT_FILECREATE, NULL, fullfilename, (void *)FTYPE_IMAGE_SNAPSHOT, ts1);
+        cam->dbse_exec(fullfilename, FTYPE_IMAGE_SNAPSHOT, ts1, "pic_save");
 
         /* Update symbolic link */
         snprintf(linkpath, PATH_MAX, "%s/lastsnap.%s", cam->conf->target_dir.c_str(), imageext(cam));
@@ -323,8 +322,8 @@ static void event_image_snapshot(ctx_dev *cam, motion_event evnt
 
         remove(fullfilename);
         pic_save_norm(cam, fullfilename, img_data->image_norm, FTYPE_IMAGE_SNAPSHOT);
-        event(cam, EVENT_FILECREATE, NULL, fullfilename, (void *)FTYPE_IMAGE_SNAPSHOT, ts1);
-        dbse_exec(cam, fullfilename, FTYPE_IMAGE_SNAPSHOT, ts1, "pic_save");
+        cam->event(EVENT_FILECREATE, NULL, fullfilename, (void *)FTYPE_IMAGE_SNAPSHOT, ts1);
+        cam->dbse_exec(fullfilename, FTYPE_IMAGE_SNAPSHOT, ts1, "pic_save");
     }
 
     cam->snapshot = 0;
@@ -363,8 +362,8 @@ static void event_image_preview(ctx_dev *cam, motion_event evnt
         } else {
             pic_save_norm(cam, previewname, cam->imgs.image_preview.image_norm, FTYPE_IMAGE);
         }
-        event(cam, EVENT_FILECREATE, NULL, previewname, (void *)FTYPE_IMAGE, ts1);
-        dbse_exec(cam, previewname, FTYPE_IMAGE, ts1, "pic_save");
+        cam->event(EVENT_FILECREATE, NULL, previewname, (void *)FTYPE_IMAGE, ts1);
+        cam->dbse_exec(previewname, FTYPE_IMAGE, ts1, "pic_save");
 
         /* Restore global context values. */
         cam->current_image = saved_current_image;
@@ -460,12 +459,12 @@ static void event_extpipe_end(ctx_dev *cam, motion_event evnt
                         , _("Unable to remove file %s"), cam->extpipefilename);
                 }
             } else {
-                event(cam, EVENT_FILECLOSE, NULL, cam->extpipefilename, (void *)FTYPE_MOVIE, ts1);
-                dbse_exec(cam,  cam->extpipefilename, FTYPE_MOVIE, ts1, "movie_end");
+                cam->event(EVENT_FILECLOSE, NULL, cam->extpipefilename, (void *)FTYPE_MOVIE, ts1);
+                cam->dbse_exec(cam->extpipefilename, FTYPE_MOVIE, ts1, "movie_end");
             }
         } else {
-            event(cam, EVENT_FILECLOSE, NULL, cam->extpipefilename, (void *)FTYPE_MOVIE, ts1);
-            dbse_exec(cam, cam->extpipefilename, FTYPE_MOVIE, ts1, "movie_end");
+            cam->event(EVENT_FILECLOSE, NULL, cam->extpipefilename, (void *)FTYPE_MOVIE, ts1);
+            cam->dbse_exec(cam->extpipefilename, FTYPE_MOVIE, ts1, "movie_end");
         }
         cam->extpipe = NULL;
     }
@@ -530,8 +529,8 @@ static void event_extpipe_start(ctx_dev *cam, motion_event evnt
 
         MOTPLS_LOG(NTC, TYPE_EVENTS, NO_ERRNO, "cam->moviefps: %d", cam->movie_fps);
 
-        event(cam, EVENT_FILECREATE, NULL, cam->extpipefilename, (void *)FTYPE_MOVIE, ts1);
-        dbse_exec(cam, cam->extpipefilename, FTYPE_MOVIE, ts1, "movie_start");
+        cam->event(EVENT_FILECREATE, NULL, cam->extpipefilename, (void *)FTYPE_MOVIE, ts1);
+        cam->dbse_exec(cam->extpipefilename, FTYPE_MOVIE, ts1, "movie_start");
         cam->extpipe = popen(cam->extpipecmdline, "we");
 
         if (cam->extpipe == NULL) {
@@ -599,19 +598,19 @@ static void event_movie_start(ctx_dev *cam, motion_event evnt
     }
 
     if (cam->conf->movie_output) {
-        retcd = movie_init_norm(cam, ts1);
+        retcd = cam->movie_init_norm(ts1);
         if (retcd < 0) {
             MOTPLS_LOG(ERR, TYPE_EVENTS, NO_ERRNO
                 ,_("Error opening ctx_dev for movie output."));
             myfree(&cam->movie_norm);
             return;
         }
-        event(cam, EVENT_FILECREATE, NULL, cam->movie_norm->full_nm, (void *)FTYPE_MOVIE, ts1);
-        dbse_exec(cam, cam->movie_norm->full_nm, FTYPE_MOVIE, ts1, "movie_start");
+        cam->event(EVENT_FILECREATE, NULL, cam->movie_norm->full_nm, (void *)FTYPE_MOVIE, ts1);
+        cam->dbse_exec(cam->movie_norm->full_nm, FTYPE_MOVIE, ts1, "movie_start");
     }
 
     if (cam->conf->movie_output_motion) {
-        retcd = movie_init_motion(cam, ts1);
+        retcd = cam->movie_init_motion(ts1);
         if (retcd < 0) {
             MOTPLS_LOG(ERR, TYPE_EVENTS, NO_ERRNO
                 ,_("Error creating motion file [%s]"), cam->movie_motion->full_nm);
@@ -630,12 +629,12 @@ static void event_movie_put(ctx_dev *cam, motion_event evnt
     (void)ftype;
 
     if (cam->movie_norm) {
-        if (movie_put_image(cam->movie_norm, img_data, ts1) == -1) {
+        if (cam->movie_norm->movie_put_image(img_data, ts1) == -1) {
             MOTPLS_LOG(ERR, TYPE_EVENTS, NO_ERRNO, _("Error encoding image"));
         }
     }
     if (cam->movie_motion) {
-        if (movie_put_image(cam->movie_motion, &cam->imgs.image_motion, ts1) == -1) {
+        if (cam->movie_motion->movie_put_image(&cam->imgs.image_motion, ts1) == -1) {
             MOTPLS_LOG(ERR, TYPE_EVENTS, NO_ERRNO, _("Error encoding image"));
         }
     }
@@ -661,20 +660,20 @@ static void event_movie_end(ctx_dev *cam, motion_event evnt
                         , cam->movie_norm->full_nm);
                 }
             } else {
-                event(cam, EVENT_FILECLOSE, NULL, cam->movie_norm->full_nm
+                cam->event(EVENT_FILECLOSE, NULL, cam->movie_norm->full_nm
                     , (void *)FTYPE_MOVIE, ts1);
-                dbse_exec(cam, cam->movie_norm->full_nm, FTYPE_MOVIE
+                cam->dbse_exec(cam->movie_norm->full_nm, FTYPE_MOVIE
                     , ts1, "movie_end");
-                dbse_movies_addrec(cam, cam->movie_norm, ts1);
+                cam->dbse_movies_addrec(cam->movie_norm, ts1);
             }
         } else {
-            event(cam, EVENT_FILECLOSE, NULL, cam->movie_norm->full_nm
+            cam->event(EVENT_FILECLOSE, NULL, cam->movie_norm->full_nm
                 , (void *)FTYPE_MOVIE, ts1);
-            dbse_exec(cam, cam->movie_norm->full_nm
+            cam->dbse_exec(cam->movie_norm->full_nm
                 , FTYPE_MOVIE, ts1, "movie_end");
-            dbse_movies_addrec(cam, cam->movie_norm, ts1);
+            cam->dbse_movies_addrec(cam->movie_norm, ts1);
         }
-        movie_close(cam->movie_norm);
+        cam->movie_norm->movie_close();
         myfree(&cam->movie_norm);
 
     }
@@ -689,24 +688,22 @@ static void event_movie_end(ctx_dev *cam, motion_event evnt
                         , cam->movie_motion->full_nm);
                 }
             } else {
-                event(cam, EVENT_FILECLOSE, NULL, cam->movie_motion->full_nm
+                cam->event(EVENT_FILECLOSE, NULL, cam->movie_motion->full_nm
                     , (void *)FTYPE_MOVIE_MOTION, ts1);
-                dbse_exec(cam, cam->movie_motion->full_nm
+                cam->dbse_exec(cam->movie_motion->full_nm
                     , FTYPE_MOVIE_MOTION, ts1, "movie_end");
-                dbse_movies_addrec(cam, cam->movie_motion, ts1);
+                cam->dbse_movies_addrec(cam->movie_motion, ts1);
             }
         } else {
-            event(cam, EVENT_FILECLOSE, NULL, cam->movie_motion->full_nm
+            cam->event(EVENT_FILECLOSE, NULL, cam->movie_motion->full_nm
                 , (void *)FTYPE_MOVIE_MOTION, ts1);
-            dbse_exec(cam, cam->movie_motion->full_nm
+            cam->dbse_exec(cam->movie_motion->full_nm
                 , FTYPE_MOVIE_MOTION, ts1, "movie_end");
-            dbse_movies_addrec(cam, cam->movie_motion, ts1);
+            cam->dbse_movies_addrec(cam->movie_motion, ts1);
         }
-        movie_close(cam->movie_motion);
+        cam->movie_motion->movie_close();
         myfree(&cam->movie_motion);
-
     }
-
 }
 
 static void event_tlapse_start(ctx_dev *cam, motion_event evnt
@@ -720,20 +717,20 @@ static void event_tlapse_start(ctx_dev *cam, motion_event evnt
     (void)ftype;
 
     if (!cam->movie_timelapse) {
-        retcd = movie_init_timelapse(cam, ts1);
+        retcd = cam->movie_init_timelapse(ts1);
         if (retcd < 0) {
             MOTPLS_LOG(ERR, TYPE_EVENTS, NO_ERRNO
                 ,_("Error creating timelapse file [%s]"), cam->movie_timelapse->full_nm);
             myfree(&cam->movie_timelapse);
             return;
         }
-        event(cam, EVENT_FILECREATE, NULL, cam->movie_timelapse->full_nm
+        cam->event(EVENT_FILECREATE, NULL, cam->movie_timelapse->full_nm
             , (void *)FTYPE_MOVIE_TIMELAPSE, ts1);
-        dbse_exec(cam, cam->movie_timelapse->full_nm, FTYPE_MOVIE_TIMELAPSE
+        cam->dbse_exec(cam->movie_timelapse->full_nm, FTYPE_MOVIE_TIMELAPSE
             , ts1, "movie_start");
     }
 
-    if (movie_put_image(cam->movie_timelapse, img_data, ts1) == -1) {
+    if (cam->movie_timelapse->movie_put_image(img_data, ts1) == -1) {
         MOTPLS_LOG(ERR, TYPE_EVENTS, NO_ERRNO, _("Error encoding image"));
     }
 
@@ -749,11 +746,11 @@ static void event_tlapse_end(ctx_dev *cam, motion_event evnt
     (void)ftype;
 
     if (cam->movie_timelapse) {
-        event(cam, EVENT_FILECLOSE, NULL, cam->movie_timelapse->full_nm
+        cam->event(EVENT_FILECLOSE, NULL, cam->movie_timelapse->full_nm
             , (void *)FTYPE_MOVIE_TIMELAPSE, ts1);
-        dbse_exec(cam, cam->movie_timelapse->full_nm
+        cam->dbse_exec(cam->movie_timelapse->full_nm
             , FTYPE_MOVIE_TIMELAPSE, ts1, "movie_end");
-        movie_close(cam->movie_timelapse);
+        cam->movie_timelapse->movie_close();
         myfree(&cam->movie_timelapse);
 
     }
@@ -915,4 +912,12 @@ void event(ctx_dev *cam, motion_event evnt
             event_handlers[i].handler(cam, evnt, img_data, fname, ftype, ts1);
         }
     }
+}
+
+} // namespace
+
+void ctx_dev::event(motion_event evnt
+           ,ctx_image_data *img_data, char *fname,void *ftype, struct timespec *ts1)
+{
+    ::event(this, evnt, img_data, fname, ftype, ts1);
 }

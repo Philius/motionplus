@@ -93,9 +93,9 @@ struct ctx_algsec {
     ctx_algsec_model        models;
 };
 
-
+/*
 void algsec_detect(ctx_dev *cam);
 void algsec_init(ctx_dev *cam);
 void algsec_deinit(ctx_dev *cam);
-
+*/
 #endif /*_INCLUDE_ALG_SEC_HPP_*/

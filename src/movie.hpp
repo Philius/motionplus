@@ -83,20 +83,26 @@ struct ctx_movie {
     struct timespec     cb_cr_ts;    /* Time during the interrupt to determine duration since start*/
     int                 cb_dur;      /* Seconds permitted before triggering a interrupt */
 
+    int movie_open();
+    int movie_put_image(ctx_image_data *img_data, const struct timespec *tv1);
+    void movie_close();
+    void movie_reset_start_time(const struct timespec *tv1);
+    void movie_free();
 };
-
 
 void movie_global_init(void);
 void movie_global_deinit(void);
 void movie_avcodec_log(void *, int, const char *, va_list);
-
+/*
 int movie_open(ctx_movie *movie);
 int movie_put_image(ctx_movie *movie, ctx_image_data *img_data, const struct timespec *tv1);
 void movie_close(ctx_movie *movie);
 void movie_reset_start_time(ctx_movie *movie, const struct timespec *tv1);
+void movie_free(ctx_movie *movie);
+
 int movie_init_timelapse(ctx_dev *cam, struct timespec *ts1);
 int movie_init_norm(ctx_dev *cam, struct timespec *ts1);
 int movie_init_motion(ctx_dev *cam, struct timespec *ts1);
-void movie_free(ctx_movie *movie);
+*/
 
 #endif /* #define _INCLUDE_MOVIE_HPP_ */

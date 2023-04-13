@@ -19,8 +19,8 @@
 #include "motionplus.hpp"
 #include "conf.hpp"
 #include "util.hpp"
-#include "alg.hpp"
-#include "draw.hpp"
+//#include "alg.hpp"
+//#include "draw.hpp"
 #include "logger.hpp"
 
 #define MAX2(x, y) ((x) > (y) ? (x) : (y))
@@ -33,6 +33,8 @@
 #define EXCLUDE_LEVEL_PERCENT 20
 /* Increment for *smartmask_buffer in alg_diff_standard. */
 #define SMARTMASK_SENSITIVITY_INCR 5
+
+namespace {
 
 typedef struct {
     int y, xl, xr, dy;
@@ -897,7 +899,7 @@ static void alg_lightswitch(ctx_dev *cam)
                 cam->frame_skip = (unsigned int)cam->conf->lightswitch_frames;
             }
             cam->current_image->diffs = 0;
-            alg_update_reference_frame(cam, RESET_REF_FRAME);
+            cam->alg_update_reference_frame(RESET_REF_FRAME);
         }
     }
 }
@@ -967,7 +969,7 @@ void alg_update_reference_frame(ctx_dev *cam, int action)
         memset(cam->imgs.ref_dyn, 0, cam->imgs.motionsize * sizeof(*cam->imgs.ref_dyn));
     }
 }
-
+#if 0
 /*Copy in new reference frame*/
 void alg_new_update_frame(ctx_dev *cam)
 {
@@ -976,7 +978,7 @@ void alg_new_update_frame(ctx_dev *cam)
     memcpy(cam->imgs.ref, cam->imgs.image_vprvcy, cam->imgs.size_norm);
 
 }
-
+#endif
 /*Calculate the center location of changes*/
 static void alg_location_center(ctx_dev *cam)
 {
@@ -1212,4 +1214,33 @@ void alg_diff(ctx_dev *cam)
 
     return;
 
+}
+} // namespace
+void ctx_dev::alg_diff()
+{
+    ::alg_diff(this);
+}
+void ctx_dev::alg_noise_tune()
+{
+    ::alg_noise_tune(this);
+}
+void ctx_dev::alg_threshold_tune()
+{
+    ::alg_threshold_tune(this);
+}
+void ctx_dev::alg_tune_smartmask()
+{
+    ::alg_tune_smartmask(this);
+}
+void ctx_dev::alg_update_reference_frame(int action)
+{
+    ::alg_update_reference_frame(this, action);
+}
+void ctx_dev::alg_stddev()
+{
+    ::alg_stddev(this);
+}
+void ctx_dev::alg_location()
+{
+    ::alg_location(this);
 }
